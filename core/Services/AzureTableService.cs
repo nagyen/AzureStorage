@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 
 namespace core.Services
 {
+    // generic service to handle basic CRUD operations for a given table entity
     public abstract class AzureTableService<T>
-        where T : TableEntity, new()
+        where T : TableEntity, new ()
     {
         protected CloudTable Table { get; set; }
         
@@ -15,19 +16,9 @@ namespace core.Services
             Table = table;
         }
         
-        // create if not exists
-        public async Task Create()
-        {
-            // Create the CloudTable if it does not exist
-            await Table.CreateIfNotExistsAsync();
-        }
-        
         // add entity
         public async Task Add(T entity)
         {
-            // create table if not exits
-            await Create();
-            
             // Create the TableOperation that inserts the entity.
             TableOperation insertOperation = TableOperation.Insert(entity);
 
@@ -38,9 +29,6 @@ namespace core.Services
         // function to get all entities of type 
         public async Task<IEnumerable<T>> GetAll()
         {
-            // create table if not exits
-            await Create();
-            
             // Construct the query operation for all entities 
             TableQuery<T> query = new TableQuery<T>();
             
@@ -66,9 +54,6 @@ namespace core.Services
         // get single entity
         public async Task<T> GetSingle(string partitionKey, string rowKey)
         {
-            // create table if not exits
-            await Create();
-            
             // Create a retrieve operation that takes a customer entity.
             TableOperation retrieveOperation = TableOperation.Retrieve<T>(partitionKey, rowKey);
 
@@ -82,9 +67,6 @@ namespace core.Services
         // delete entity
         public async Task DeleteSingle(string partitionKey, string rowKey)
         {
-            // create table if not exits
-            await Create();
-            
             // Create a retrieve operation that expects a customer entity.
             TableOperation retrieveOperation = TableOperation.Retrieve<T>(partitionKey, rowKey);
 
