@@ -10,12 +10,6 @@ namespace web.Controllers
 {
     public class HomeController : Controller
     {
-        private UserService UserService { get; }
-        
-        public HomeController(IUserServiceFactory userServiceFactory)
-        {
-            UserService = userServiceFactory.GetUserService();
-        }
         
         public IActionResult Index()
         {
