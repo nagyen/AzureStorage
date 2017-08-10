@@ -1,4 +1,5 @@
-﻿using Microsoft.WindowsAzure.Storage;
+﻿using System;
+using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 
 namespace core.Models
@@ -12,11 +13,15 @@ namespace core.Models
         }
         
         public User() { }
-
+        
+        public int Age { get; set; }
+        
         public string Email { get; set; }
 
         public string PhoneNumber { get; set; }
         
         public string Image { get; set; }
+        
+        public DateTime CreateDateTime { get; set; }
     }
 }
