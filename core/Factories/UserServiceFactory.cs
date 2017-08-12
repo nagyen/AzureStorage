@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 
-namespace core.Factory
+namespace core.Factories
 {
     public class UserServiceFactory : IUserServiceFactory
     {
@@ -18,7 +18,7 @@ namespace core.Factory
         // factory method to create UserService
         public UserService GetUserService()
         {
-            var azureConnString = Configuration.GetConnectionString("AzureTableConnectionString");
+            var azureConnString = Configuration.GetConnectionString("AzureStorageConnectionString");
             
             // create storage account
             var storageAccount = CloudStorageAccount.Parse(azureConnString);

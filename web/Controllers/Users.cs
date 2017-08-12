@@ -15,11 +15,15 @@ namespace web.Controllers
     public class Users : Controller
     {
         private UserService UserService { get; }
+        private UserImageService UserImageService { get; }
         private IHostingEnvironment Environment { get; }
         
-        public Users(IUserServiceFactory userServiceFactory, IHostingEnvironment environment)
+        public Users(IUserServiceFactory userServiceFactory, 
+                     IUserImageServiceFactory userImageServiceFactory,
+                     IHostingEnvironment environment)
         {
             UserService = userServiceFactory.GetUserService();
+            UserImageService = userImageServiceFactory.GetUserImageService();
             Environment = environment;
         }
         
@@ -71,28 +75,34 @@ namespace web.Controllers
                 
                 // check if valid image
                 var imageType = Path.GetExtension(image.FileName).ToLower();
-                
-                // allow only jpg images for now
-                if (image.Length <= 0 ||  imageType != ".jpg" || imageType == ".jpeg")
-                return Ok(new
-                {
-                    code = 1,
-                    error = "Invalid Image. Please select a valid .jpg file."
-                });
-                
-                // path to save image
-                var uploads = Path.Combine(Environment.WebRootPath, "uploads");
-                
-                // create unique name for image to prevent overwrites
-                var imageId = $"{Guid.NewGuid()}.jpg";
-                
-                // save image
-                using (var fileStream = new FileStream(Path.Combine(uploads, imageId), FileMode.Create))
-                {
-                    await image.CopyToAsync(fileStream);
+
+				// allow only jpg images for now
+                if (image.Length <= 0 ||  (imageType != ".jpg" && imageType != ".jpeg"))
+				{
+					return Ok(new
+					{
+						code = 1,
+						error = "Invalid Image. Please select a valid .jpg file."
+					});
                 }
-                    
-                
+
+                // read image content
+                byte[] imageBytes;
+                using (var fs = image.OpenReadStream())
+                {
+                    using(var ms = new MemoryStream())
+                    {
+                        await fs.CopyToAsync(ms);
+                        imageBytes = ms.ToArray();
+                    }
+                }
+
+				// create unique name for image to prevent overwrites
+				var imageId = $"{Guid.NewGuid()}";
+
+                // save image
+                var imageUrl = await UserImageService.AddImage(imageId, imageBytes);
+
                 // create user entity
                 var user = new User
                 {
@@ -100,7 +110,7 @@ namespace web.Controllers
                     RowKey = firstName,
                     Age = age,
                     Email = email,
-                    Image = $"/uploads/{imageId}",
+                    Image = imageUrl,
                     CreateDateTime = DateTime.Now
                 };
                 
@@ -112,6 +122,7 @@ namespace web.Controllers
                 {
                     code = 0
                 });
+
             }
             catch (Exception)
             {

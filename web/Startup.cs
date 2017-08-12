@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using core.Interfaces;
-using core.Factory;
+using core.Factories;
 
 namespace web
 {
@@ -33,7 +33,8 @@ namespace web
             services.AddMvc();
 
             services.AddSingleton<IConfiguration>(Configuration);
-            services.AddScoped<IUserServiceFactory, UserServiceFactory>();
+			services.AddScoped<IUserServiceFactory, UserServiceFactory>();
+			services.AddScoped<IUserImageServiceFactory, UserImageServiceFactory>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
